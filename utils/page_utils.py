@@ -16,9 +16,13 @@ def apply_compact_sidebar_css():
     """Apply compact CSS to sidebar to fit everything without scrolling."""
     st.markdown("""
         <style>
-        /* Hide the app page link from sidebar navigation */
-        [data-testid="stSidebarNav"] a[href*="app"],
-        [data-testid="stSidebarNav"] a[href*="/app"] {
+        /* Ensure sidebar navigation is visible */
+        [data-testid="stSidebarNav"] {
+            display: block !important;
+        }
+        /* Hide only the app page link from sidebar navigation */
+        [data-testid="stSidebarNav"] a[href*="app"]:not([href*="pages"]),
+        [data-testid="stSidebarNav"] a[href="/"] {
             display: none !important;
         }
         </style>
@@ -29,14 +33,34 @@ def apply_compact_sidebar_css():
                 const links = sidebarNav.querySelectorAll('a');
                 links.forEach(link => {
                     const href = link.getAttribute('href') || '';
-                    if (href.includes('app') && !href.includes('pages')) {
-                        link.closest('li')?.remove();
+                    const text = link.textContent || '';
+                    // Only hide links that are specifically the "app" page, not pages
+                    if ((href === '/' || href.includes('/app') || text.toLowerCase().includes('app')) && 
+                        !href.includes('pages') && 
+                        !text.includes('📊') && 
+                        !text.includes('👥') && 
+                        !text.includes('🤖') && 
+                        !text.includes('💚') && 
+                        !text.includes('⚙️') && 
+                        !text.includes('🚀') && 
+                        !text.includes('💡') && 
+                        !text.includes('📋')) {
+                        const listItem = link.closest('li') || link.closest('[role="listitem"]');
+                        if (listItem) {
+                            listItem.style.display = 'none';
+                        }
                     }
                 });
             }
         }
-        hideAppPage();
-        setTimeout(hideAppPage, 100);
+        // Run after DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', hideAppPage);
+        } else {
+            hideAppPage();
+        }
+        setTimeout(hideAppPage, 500);
+        setTimeout(hideAppPage, 1000);
         </script>
         <style>
         [data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div {

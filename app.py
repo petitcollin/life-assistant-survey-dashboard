@@ -19,4 +19,13 @@ except Exception as e:
     st.title("AI Life Assistant Survey Dashboard")
     st.info("Please navigate to the Executive Summary page from the sidebar.")
     st.markdown("Or click here: [Executive Summary](pages/1_📊_Executive_Summary.py)")
+    
+    # Ensure sidebar navigation is visible
+    st.markdown("""
+    <style>
+    [data-testid="stSidebarNav"] {
+        display: block !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
