@@ -16,13 +16,16 @@ def apply_compact_sidebar_css():
     """Apply compact CSS to sidebar to fit everything without scrolling."""
     st.markdown("""
         <style>
-        /* Ensure sidebar navigation is visible and not hidden */
-        [data-testid="stSidebarNav"] {
+        /* Ensure sidebar navigation is ALWAYS visible */
+        [data-testid="stSidebarNav"],
+        [data-testid="stSidebarNav"] ul,
+        [data-testid="stSidebarNav"] li {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
         }
-        /* Compact sidebar styling */
+        
+        /* Compact sidebar styling for filters only */
         [data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div {
             padding-top: 0.25rem;
             padding-bottom: 0.25rem;
@@ -42,37 +45,49 @@ def apply_compact_sidebar_css():
             font-size: 0.9rem;
             margin-top: 0.3rem;
         }
-        [data-testid="stSidebar"] {
-            padding-top: 1rem;
-        }
         </style>
         <script>
-        // Only hide the "app" page link, keep all other navigation visible
-        function hideAppPageOnly() {
+        // Ensure navigation is visible and only hide the "app" page link
+        function ensureNavVisible() {
             const sidebarNav = document.querySelector('[data-testid="stSidebarNav"]');
             if (sidebarNav) {
-                // Make sure navigation is visible
+                // Force navigation to be visible
                 sidebarNav.style.display = 'block';
                 sidebarNav.style.visibility = 'visible';
+                sidebarNav.style.opacity = '1';
                 
+                // Only hide the "app" page link (root or app.py)
                 const links = sidebarNav.querySelectorAll('a');
                 links.forEach(link => {
                     const href = link.getAttribute('href') || '';
-                    const text = (link.textContent || '').trim().toLowerCase();
+                    const text = (link.textContent || '').trim();
                     
-                    // Only hide if it's specifically the app page (no emoji, just "app" or root)
-                    if (href === '/' || (href.includes('app') && !href.includes('pages') && text === 'app')) {
+                    // Only hide if it's the root "/" or "app" without pages
+                    if (href === '/' || (href.includes('/app') && !href.includes('pages') && text.toLowerCase() === 'app')) {
                         const listItem = link.closest('li') || link.closest('[role="listitem"]');
                         if (listItem) {
                             listItem.style.display = 'none';
+                        }
+                    } else {
+                        // Make sure all other links are visible
+                        const listItem = link.closest('li') || link.closest('[role="listitem"]');
+                        if (listItem) {
+                            listItem.style.display = 'block';
+                            listItem.style.visibility = 'visible';
                         }
                     }
                 });
             }
         }
-        // Run after a delay to ensure DOM is ready
-        setTimeout(hideAppPageOnly, 100);
-        setTimeout(hideAppPageOnly, 500);
+        // Run multiple times to ensure it works
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', ensureNavVisible);
+        } else {
+            ensureNavVisible();
+        }
+        setTimeout(ensureNavVisible, 100);
+        setTimeout(ensureNavVisible, 500);
+        setTimeout(ensureNavVisible, 1000);
         </script>
     """, unsafe_allow_html=True)
 
