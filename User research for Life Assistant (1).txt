@@ -1,0 +1,265 @@
+﻿🧩 Life Assistant Survey (v2)
+English Version
+Q1. How old are you?
+Single choice
+* 18–24
+* 25–34
+* 35–44
+* 45–54
+* 55+
+________________
+
+
+Q2. How do you identify?
+Single choice
+* Male
+* Female
+* Non-binary
+________________
+
+
+Q3. How often do you use AI tools such as ChatGPT, Gemini, or others?
+Single choice
+* Daily
+* Occasionally
+* I’ve only tried it once or twice
+* I don’t use AI tools → skip Q4? 
+________________
+
+
+Q4. For which of the following do you typically use AI tools?
+Multiple choice (Select all that apply) - Randomise
+* Planning or organizing my day, tasks, or schedule
+* Brainstorming ideas or creative content
+* Learning or studying something new
+* Online shopping or comparing products
+* Managing money or tracking expenses
+* Getting health, fitness, or wellness advice
+* Finding recipes and meal planning
+* Planning trips or activities
+* Searching for information, answering questions
+* Social or relationship advice 
+* Getting motivation or mental health support
+* Practicing conversations or preparing for interviews
+* Helping with home projects or DIY tasks
+* Discovering new music, movies, books, or content
+* Other: please specify
+________________
+
+
+Q5. How comfortable would you feel using a personal AI assistant that proactively helps you manage your daily life?
+5-point Likert
+1 = Not open at all → 5 = Very open
+________________
+
+
+Q6. Which of the following would you most want your personal AI assistant to help you with?
+Multiple choice (Select all that apply) - Randomise
+* Planning or organizing my day, tasks, or schedule
+* Brainstorming ideas or creative content
+* Learning or studying something new
+* Online shopping or comparing products
+* Managing money or tracking expenses
+* Getting health, fitness, or wellness advice
+* Finding recipes and meal planning
+* Planning trips or activities
+* Searching for information, answering questions
+* Social or relationship advice
+* Getting motivation or mental health support
+* Practicing conversations or preparing for interviews
+* Discovering new music, movies, books, or content
+* Helping with home projects or DIY tasks
+* Other: please specify
+________________
+
+
+Q7. How comfortable would you feel giving this assistant access to your calendar and emails for better results and experience?
+5-point Likert
+1 = Not comfortable at all → 5 = Very comfortable
+________________
+
+
+Q8. How would you prefer to interact with your AI assistant in your daily life?
+Single choice
+* Through text — I type, and it replies in text
+* Through voice — I speak, and it speaks back
+* Both — sometimes voice, sometimes text, depending on the situation
+________________
+
+
+Q9. How comfortable would you feel speaking to an AI assistant out loud in public (e.g. on your phone or earbuds)?
+5-point Likert
+1 = Very uncomfortable → 5 = Very comfortable
+________________
+
+
+Q10. What matters to you most when thinking about using an AI assistant? 
+Multiple choice (Select all that apply) - Randomise
+* It saves me time or makes my life easier
+* It helps me make better decisions
+* It helps me save money
+* It respects my privacy and data
+* It consistently delivers high-quality, accurate results
+* It’s free or affordable
+* It feels natural and human-like to interact with
+* It has a trusted brand or reputation
+* It learns and improves based on my habits
+* It integrates well with the apps and tools I already use
+________________
+
+
+Q11. What would make you NOT want to use a personal AI assistant?
+Multiple choice (Select all that apply) - Randomise
+* I don’t trust how my data would be used
+* It feels too robotic or impersonal
+* It makes mistakes or gives unreliable answers
+* It takes too much effort to set up or use
+* It doesn’t integrate well with the tools I already use
+* It’s too expensive
+* I worry it could replace human interaction
+* I don’t see a clear benefit compared to what I already use
+* I prefer to stay in control and do things myself
+________________
+
+
+Q12. Which best describes how you’d like your AI assistant to behave?
+Single choice
+* A helpful partner that assists me while I stay in control (“Do it with me”)
+* A capable assistant that handles things automatically for me (“Do it for me”)
+* It depends on the task
+________________
+
+
+
+
+Q13. Before we wrap up — what time-consuming or repetitive tasks in your day would you want a digital AI assistant to help with?
+Open text 
+
+
+Dutch Version
+Q1. Hoe oud bent u?
+Enkele keuze
+* 18–24
+* 25–34
+* 35–44
+* 45–54
+* 55 jaar of ouder
+
+________________
+
+
+Q2. Hoe identificeert u zichzelf?
+Enkele keuze
+   * Man
+   * Vrouw
+   * Non-binair
+
+________________
+
+
+Q3. Hoe vaak gebruikt u AI-tools zoals ChatGPT, Gemini of andere?
+Enkele keuze
+      * Dagelijks
+      * Af en toe
+      * Ik heb het één of twee keer geprobeerd
+      * Ik gebruik geen AI-tools → sla Q4 over
+
+________________
+
+
+Q4. Voor welke van de onderstaande dingen gebruikt u meestal AI-tools?
+Meerkeuze (selecteer alle opties die van toepassing zijn)
+         * Mijn dag, taken of agenda plannen of organiseren
+         * Ideeën of creatieve content bedenken
+         * Iets nieuws leren of studeren
+         * Online winkelen of producten vergelijken
+         * Geld beheren of uitgaven bijhouden
+         * Advies over gezondheid, fitness of welzijn krijgen
+         * Recepten vinden en maaltijden plannen
+         * Reizen of activiteiten plannen
+         * Informatie opzoeken of vragen beantwoorden
+         * Sociaal of relatieadvies krijgen
+         * Motivatie of mentale steun krijgen
+         * Gesprekken oefenen of voorbereiden op een sollicitatie
+         * Helpen met klussen of doe-het-zelf projecten
+         * Nieuwe muziek, films, boeken of content ontdekken
+         * Anders, namelijk…
+
+________________
+
+
+Q5. Hoe comfortabel zou u zich voelen bij het gebruik van een persoonlijke AI-assistent die u proactief helpt uw dagelijks leven te organiseren?
+5-puntsschaal
+ 1 = Helemaal niet comfortabel → 5 = Zeer comfortabel
+________________
+
+
+Q6. Waarmee zou u willen dat een persoonlijke AI-assistent u helpt?
+Meerkeuze (selecteer alle opties die van toepassing zijn)
+(Zelfde opties als Q4, maar gericht op wens i.p.v. huidig gebruik)
+________________
+
+
+Q7. Hoe comfortabel zou u zich voelen om deze assistent toegang te geven tot uw agenda en e-mails, voor snellere en betere resultaten?
+5-puntsschaal
+ 1 = Helemaal niet comfortabel → 5 = Zeer comfortabel
+________________
+
+
+Q8. Hoe zou u het liefst communiceren met uw AI-assistent in het dagelijks leven?
+Enkele keuze
+            * Via tekst — ik typ, en de assistent antwoordt in tekst
+            * Via spraak — ik spreek, en de assistent praat terug
+            * Een combinatie — soms spraak, soms tekst, afhankelijk van de situatie
+
+________________
+
+
+Q9. Hoe comfortabel zou u zich voelen om hardop met een AI-assistent te praten in het openbaar (bijv. via uw telefoon of oortjes)?
+5-puntsschaal
+ 1 = Helemaal niet comfortabel → 5 = Zeer comfortabel
+________________
+
+
+Q10. Wat vindt u het belangrijkst bij het gebruik van een AI-assistent?
+Meerkeuze (selecteer alle opties die van toepassing zijn)
+               * Het bespaart me tijd of maakt mijn leven makkelijker
+               * Het helpt me betere beslissingen nemen
+               * Het helpt me geld besparen
+               * Het respecteert mijn privacy en gegevens
+               * Het levert consequent nauwkeurige en kwalitatieve resultaten
+               * Het is gratis of betaalbaar
+               * Het voelt natuurlijk en menselijk aan in de interactie
+               * Het komt van een betrouwbaar merk
+               * Het leert en verbetert op basis van mijn gewoontes
+               * Het werkt goed samen met apps en tools die ik al gebruik
+
+________________
+
+
+Q11. Wat zou u ervan weerhouden om een persoonlijke AI-assistent te gebruiken?
+Meerkeuze (selecteer alle opties die van toepassing zijn)
+                  * Ik vertrouw niet hoe mijn gegevens worden gebruikt
+                  * Het voelt te robotachtig of onpersoonlijk
+                  * Het maakt fouten of geeft onbetrouwbare antwoorden
+                  * Het kost te veel moeite om in te stellen of te gebruiken
+                  * Het werkt niet goed samen met de tools die ik al gebruik
+                  * Het is te duur
+                  * Ik ben bang dat het menselijke interactie vervangt
+                  * Ik zie geen duidelijk voordeel ten opzichte van wat ik nu gebruik
+                  * Ik doe liever dingen zelf en behoud de controle
+
+________________
+
+
+Q12. Wat beschrijft het beste hoe u wilt dat uw AI-assistent zich gedraagt?
+Enkele keuze
+                     * Een behulpzame partner die me ondersteunt terwijl ik de controle houd (“Samen doen”)
+                     * Een bekwame assistent die dingen automatisch voor me regelt (“Voor mij doen”)
+                     * Dat hangt af van de taak
+
+________________
+
+
+Q13. Tot slot — met welke tijdrovende of herhalende taken in uw dagelijks leven zou u willen dat een digitale AI-assistent u helpt?
+Open tekst (optioneel)
