@@ -16,53 +16,13 @@ def apply_compact_sidebar_css():
     """Apply compact CSS to sidebar to fit everything without scrolling."""
     st.markdown("""
         <style>
-        /* Ensure sidebar navigation is visible */
+        /* Ensure sidebar navigation is visible and not hidden */
         [data-testid="stSidebarNav"] {
             display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
-        /* Hide only the app page link from sidebar navigation */
-        [data-testid="stSidebarNav"] a[href*="app"]:not([href*="pages"]),
-        [data-testid="stSidebarNav"] a[href="/"] {
-            display: none !important;
-        }
-        </style>
-        <script>
-        function hideAppPage() {
-            const sidebarNav = document.querySelector('[data-testid="stSidebarNav"]');
-            if (sidebarNav) {
-                const links = sidebarNav.querySelectorAll('a');
-                links.forEach(link => {
-                    const href = link.getAttribute('href') || '';
-                    const text = link.textContent || '';
-                    // Only hide links that are specifically the "app" page, not pages
-                    if ((href === '/' || href.includes('/app') || text.toLowerCase().includes('app')) && 
-                        !href.includes('pages') && 
-                        !text.includes('📊') && 
-                        !text.includes('👥') && 
-                        !text.includes('🤖') && 
-                        !text.includes('💚') && 
-                        !text.includes('⚙️') && 
-                        !text.includes('🚀') && 
-                        !text.includes('💡') && 
-                        !text.includes('📋')) {
-                        const listItem = link.closest('li') || link.closest('[role="listitem"]');
-                        if (listItem) {
-                            listItem.style.display = 'none';
-                        }
-                    }
-                });
-            }
-        }
-        // Run after DOM is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', hideAppPage);
-        } else {
-            hideAppPage();
-        }
-        setTimeout(hideAppPage, 500);
-        setTimeout(hideAppPage, 1000);
-        </script>
-        <style>
+        /* Compact sidebar styling */
         [data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div {
             padding-top: 0.25rem;
             padding-bottom: 0.25rem;
@@ -86,6 +46,34 @@ def apply_compact_sidebar_css():
             padding-top: 1rem;
         }
         </style>
+        <script>
+        // Only hide the "app" page link, keep all other navigation visible
+        function hideAppPageOnly() {
+            const sidebarNav = document.querySelector('[data-testid="stSidebarNav"]');
+            if (sidebarNav) {
+                // Make sure navigation is visible
+                sidebarNav.style.display = 'block';
+                sidebarNav.style.visibility = 'visible';
+                
+                const links = sidebarNav.querySelectorAll('a');
+                links.forEach(link => {
+                    const href = link.getAttribute('href') || '';
+                    const text = (link.textContent || '').trim().toLowerCase();
+                    
+                    // Only hide if it's specifically the app page (no emoji, just "app" or root)
+                    if (href === '/' || (href.includes('app') && !href.includes('pages') && text === 'app')) {
+                        const listItem = link.closest('li') || link.closest('[role="listitem"]');
+                        if (listItem) {
+                            listItem.style.display = 'none';
+                        }
+                    }
+                });
+            }
+        }
+        // Run after a delay to ensure DOM is ready
+        setTimeout(hideAppPageOnly, 100);
+        setTimeout(hideAppPageOnly, 500);
+        </script>
     """, unsafe_allow_html=True)
 
 
