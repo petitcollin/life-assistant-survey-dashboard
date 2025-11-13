@@ -12,6 +12,11 @@ st.set_page_config(
 )
 
 # Redirect to Executive Summary
-import streamlit as st
-st.switch_page("pages/1_📊_Executive_Summary.py")
+try:
+    st.switch_page("pages/1_📊_Executive_Summary.py")
+except Exception as e:
+    # Fallback: if switch_page fails, just show a message and link
+    st.title("AI Life Assistant Survey Dashboard")
+    st.info("Please navigate to the Executive Summary page from the sidebar.")
+    st.markdown("Or click here: [Executive Summary](pages/1_📊_Executive_Summary.py)")
 
