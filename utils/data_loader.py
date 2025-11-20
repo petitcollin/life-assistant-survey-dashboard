@@ -125,7 +125,7 @@ def load_data(cache_version="v2.0"):
 
 
 @st.cache_data
-def preprocess_data(df):
+def preprocess_data(df, cache_version="v2.0"):
     """Preprocess the data with value labels and clean missing values."""
     df_processed = df.copy()
     

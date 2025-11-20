@@ -97,11 +97,23 @@ def init_page():
     # Apply compact sidebar CSS
     apply_compact_sidebar_css()
     
-    # Initialize data if not already loaded
-    if 'data_loaded' not in st.session_state:
-        df_raw = load_data()
-        df_processed = preprocess_data(df_raw)
+    # Cache version to force refresh when data changes
+    CACHE_VERSION = "v2.0"
+    
+    # Initialize data - always reload to ensure we have the latest
+    # Check if we need to reload based on cache version
+    if 'cache_version' not in st.session_state or st.session_state.cache_version != CACHE_VERSION:
+        df_raw = load_data(cache_version=CACHE_VERSION)
+        df_processed = preprocess_data(df_raw, cache_version=CACHE_VERSION)
         st.session_state.df_processed = df_processed
+        st.session_state.cache_version = CACHE_VERSION
+        st.session_state.data_loaded = True
+    elif 'df_processed' not in st.session_state:
+        # Fallback: load if session state is missing
+        df_raw = load_data(cache_version=CACHE_VERSION)
+        df_processed = preprocess_data(df_raw, cache_version=CACHE_VERSION)
+        st.session_state.df_processed = df_processed
+        st.session_state.cache_version = CACHE_VERSION
         st.session_state.data_loaded = True
     
     # Render sidebar filters and get filtered data
