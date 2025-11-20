@@ -110,14 +110,17 @@ LIKERT_LABELS = {
 @st.cache_data
 def load_data():
     """Load the survey data from Excel file."""
-    # Try the new Excel file first, fallback to CSV
+    # Try the new Excel file first (1000 records), then fallback to others
     try:
-        df = pd.read_excel('data/Life Assistant survey 2.xlsx')
+        df = pd.read_excel('data/Life Assistant survey 2 (1).xlsx')
     except:
         try:
-            df = pd.read_excel('data/ORD-95068-Z6P5Y2_2025-11-12_DD.xlsx')
+            df = pd.read_excel('data/Life Assistant survey 2.xlsx')
         except:
-            df = pd.read_csv('data/Life_Assistant_survey_2.csv')
+            try:
+                df = pd.read_excel('data/ORD-95068-Z6P5Y2_2025-11-12_DD.xlsx')
+            except:
+                df = pd.read_csv('data/Life_Assistant_survey_2.csv')
     return df
 
 
@@ -147,8 +150,17 @@ def preprocess_data(df):
     column_mapping = {**q10_mapping, **q11_mapping}
     df_processed = df_processed.rename(columns=column_mapping)
     
-    # English columns (Q13_english, Q14_english, Q15_english) already exist in CSV
-    # No need to create them - they're already there!
+    # Normalize English column names (handle both Q13_English and Q13_english)
+    english_col_mapping = {}
+    for col in df_processed.columns:
+        if col == 'Q13_English':
+            english_col_mapping[col] = 'Q13_english'
+        elif col == 'Q14_English':
+            english_col_mapping[col] = 'Q14_english'
+        elif col == 'Q15_English':
+            english_col_mapping[col] = 'Q15_english'
+    if english_col_mapping:
+        df_processed = df_processed.rename(columns=english_col_mapping)
     
     return df_processed
 

@@ -76,10 +76,13 @@ QUESTION_MAPPINGS = {
     'Q12': 'Preferred assistant behavior',
     'Q13': 'Time-consuming tasks (original)',
     'Q13_english': 'Time-consuming tasks',
+    'Q13_English': 'Time-consuming tasks',
     'Q14': 'Why frustrating/time-consuming (original)',
     'Q14_english': 'Why do you find these tasks frustrating or time-consuming?',
+    'Q14_English': 'Why do you find these tasks frustrating or time-consuming?',
     'Q15': 'How AI should help (original)',
     'Q15_english': 'How would you expect an AI assistant to help with these tasks?',
+    'Q15_English': 'How would you expect an AI assistant to help with these tasks?',
 }
 
 def create_readable_dataframe(df):
