@@ -47,6 +47,20 @@ if len(q7_dist) > 0:
     q7_dict = q7_dist.to_dict()
     fig = create_likert_chart(q7_dict, title="", labels=LIKERT_LABELS)
     st.plotly_chart(fig, use_container_width=True)
+    
+    # Statistics
+    total = len(df)
+    comfortable = len(df[df['Q7_1'].isin([4, 5])])
+    neutral = len(df[df['Q7_1'] == 3])
+    uncomfortable = len(df[df['Q7_1'].isin([1, 2])])
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"**Comfortable (4-5):** {comfortable} ({comfortable/total*100:.1f}%)")
+    with col2:
+        st.markdown(f"**Neutral (3):** {neutral} ({neutral/total*100:.1f}%)")
+    with col3:
+        st.markdown(f"**Uncomfortable (1-2):** {uncomfortable} ({uncomfortable/total*100:.1f}%)")
 
 st.markdown("---")
 
@@ -59,4 +73,18 @@ if len(q9_dist) > 0:
     q9_dict = q9_dist.to_dict()
     fig = create_likert_chart(q9_dict, title="", labels=LIKERT_LABELS)
     st.plotly_chart(fig, use_container_width=True)
+    
+    # Statistics
+    total = len(df)
+    comfortable = len(df[df['Q9_1'].isin([4, 5])])
+    neutral = len(df[df['Q9_1'] == 3])
+    uncomfortable = len(df[df['Q9_1'].isin([1, 2])])
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"**Comfortable (4-5):** {comfortable} ({comfortable/total*100:.1f}%)")
+    with col2:
+        st.markdown(f"**Neutral (3):** {neutral} ({neutral/total*100:.1f}%)")
+    with col3:
+        st.markdown(f"**Uncomfortable (1-2):** {uncomfortable} ({uncomfortable/total*100:.1f}%)")
 
