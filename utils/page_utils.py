@@ -34,6 +34,14 @@ def apply_compact_sidebar_css():
             margin-bottom: 0.1rem;
             font-size: 0.9rem;
         }
+        [data-testid="stSidebar"] .stCheckbox {
+            margin-bottom: 0.1rem;
+        }
+        [data-testid="stSidebar"] .stCheckbox > label {
+            font-size: 0.9rem;
+            padding-top: 0.1rem;
+            padding-bottom: 0.1rem;
+        }
         [data-testid="stSidebar"] [data-testid="stMetricValue"] {
             font-size: 1.1rem;
         }

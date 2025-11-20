@@ -178,17 +178,27 @@ def preprocess_data(df, cache_version="v2.1"):
 
 
 def get_filtered_data(df, age_filter=None, gender_filter=None, usage_filter=None):
-    """Apply filters to the dataset."""
+    """Apply filters to the dataset.
+    
+    Args:
+        df: DataFrame to filter
+        age_filter: List of age groups to include (empty list = no filter)
+        gender_filter: List of genders to include (empty list = no filter)
+        usage_filter: List of usage frequencies to include (empty list = no filter)
+    """
     df_filtered = df.copy()
     
-    if age_filter and age_filter != 'All':
-        df_filtered = df_filtered[df_filtered['Q1'] == age_filter]
+    # Age filter - support multiple selections
+    if age_filter and len(age_filter) > 0:
+        df_filtered = df_filtered[df_filtered['Q1'].isin(age_filter)]
     
-    if gender_filter and gender_filter != 'All':
-        df_filtered = df_filtered[df_filtered['Q2'] == gender_filter]
+    # Gender filter - support multiple selections
+    if gender_filter and len(gender_filter) > 0:
+        df_filtered = df_filtered[df_filtered['Q2'].isin(gender_filter)]
     
-    if usage_filter and usage_filter != 'All':
-        df_filtered = df_filtered[df_filtered['Q3'] == usage_filter]
+    # Usage frequency filter - support multiple selections
+    if usage_filter and len(usage_filter) > 0:
+        df_filtered = df_filtered[df_filtered['Q3'].isin(usage_filter)]
     
     return df_filtered
 
