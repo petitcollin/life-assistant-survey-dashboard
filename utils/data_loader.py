@@ -108,7 +108,7 @@ LIKERT_LABELS = {
 
 
 @st.cache_data
-def load_data():
+def load_data(cache_version="v2.0"):
     """Load the survey data from Excel file."""
     # Try the new Excel file first (1000 records), then fallback to others
     try:
