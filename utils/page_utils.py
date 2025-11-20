@@ -50,8 +50,14 @@ def apply_compact_sidebar_css():
         }
         [data-testid="stSidebar"] .stButton > button {
             padding: 0.3rem;
-            font-size: 0.9rem;
-            margin-top: 0.3rem;
+            font-size: 0.85rem;
+            margin-top: 0.2rem;
+            margin-bottom: 0.2rem;
+        }
+        [data-testid="stSidebar"] .stCaption {
+            font-size: 0.8rem;
+            margin-top: 0.1rem;
+            margin-bottom: 0.3rem;
         }
         </style>
         <script>

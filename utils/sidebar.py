@@ -20,6 +20,20 @@ def render_sidebar_filters(df_processed):
         # Age filter - Multi-select with checkboxes
         st.write("**Age Group**")
         age_options = sorted([age for age in df_processed['Q1'].unique() if pd.notna(age)])
+        
+        # Select All / Deselect All buttons
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Select All", key='age_select_all', use_container_width=True):
+                for age in age_options:
+                    st.session_state[f'age_checkbox_{age}'] = True
+                st.rerun()
+        with col2:
+            if st.button("Clear", key='age_clear', use_container_width=True):
+                for age in age_options:
+                    st.session_state[f'age_checkbox_{age}'] = False
+                st.rerun()
+        
         age_filter_selected = []
         for age in age_options:
             checkbox_key = f'age_checkbox_{age}'
@@ -35,11 +49,31 @@ def render_sidebar_filters(df_processed):
                 age_filter_selected.append(age)
         st.session_state.age_filter_selected = age_filter_selected
         
+        # Show active filter count
+        if len(age_filter_selected) > 0:
+            st.caption(f"✓ {len(age_filter_selected)} selected")
+        else:
+            st.caption("No filter (showing all)")
+        
         st.markdown("---")
         
         # Gender filter - Multi-select with checkboxes
         st.write("**Gender**")
         gender_options = sorted([g for g in df_processed['Q2'].unique() if pd.notna(g)])
+        
+        # Select All / Deselect All buttons
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Select All", key='gender_select_all', use_container_width=True):
+                for gender in gender_options:
+                    st.session_state[f'gender_checkbox_{gender}'] = True
+                st.rerun()
+        with col2:
+            if st.button("Clear", key='gender_clear', use_container_width=True):
+                for gender in gender_options:
+                    st.session_state[f'gender_checkbox_{gender}'] = False
+                st.rerun()
+        
         gender_filter_selected = []
         for gender in gender_options:
             checkbox_key = f'gender_checkbox_{gender}'
@@ -55,11 +89,31 @@ def render_sidebar_filters(df_processed):
                 gender_filter_selected.append(gender)
         st.session_state.gender_filter_selected = gender_filter_selected
         
+        # Show active filter count
+        if len(gender_filter_selected) > 0:
+            st.caption(f"✓ {len(gender_filter_selected)} selected")
+        else:
+            st.caption("No filter (showing all)")
+        
         st.markdown("---")
         
         # Usage frequency filter - Multi-select with checkboxes
         st.write("**AI Usage Frequency**")
         usage_options = sorted([u for u in df_processed['Q3'].unique() if pd.notna(u)])
+        
+        # Select All / Deselect All buttons
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Select All", key='usage_select_all', use_container_width=True):
+                for usage in usage_options:
+                    st.session_state[f'usage_checkbox_{usage}'] = True
+                st.rerun()
+        with col2:
+            if st.button("Clear", key='usage_clear', use_container_width=True):
+                for usage in usage_options:
+                    st.session_state[f'usage_checkbox_{usage}'] = False
+                st.rerun()
+        
         usage_filter_selected = []
         for usage in usage_options:
             checkbox_key = f'usage_checkbox_{usage}'
@@ -74,6 +128,12 @@ def render_sidebar_filters(df_processed):
             if checked:
                 usage_filter_selected.append(usage)
         st.session_state.usage_filter_selected = usage_filter_selected
+        
+        # Show active filter count
+        if len(usage_filter_selected) > 0:
+            st.caption(f"✓ {len(usage_filter_selected)} selected")
+        else:
+            st.caption("No filter (showing all)")
         
         st.markdown("---")
         
