@@ -108,11 +108,23 @@ LIKERT_LABELS = {
 
 
 @st.cache_data
-def load_data(cache_version="v2.0"):
+def load_data(cache_version="v2.1"):
     """Load the survey data from Excel file."""
     # Try the new Excel file first (1000 records), then fallback to others
     try:
         df = pd.read_excel('data/Life Assistant survey 2 (1).xlsx')
+        # Handle duplicate columns (Q1, Q2, etc. and Q1.1, Q2.1, etc.)
+        # Merge: use original columns where they exist, fallback to .1 columns
+        columns_to_merge = []
+        for col in df.columns:
+            if col.endswith('.1') and col[:-2] in df.columns:
+                original_col = col[:-2]
+                # Fill original column with .1 column values where original is NaN
+                df[original_col] = df[original_col].fillna(df[col])
+                columns_to_merge.append(col)
+        # Drop the .1 columns after merging
+        if columns_to_merge:
+            df = df.drop(columns=columns_to_merge)
     except:
         try:
             df = pd.read_excel('data/Life Assistant survey 2.xlsx')
@@ -125,7 +137,7 @@ def load_data(cache_version="v2.0"):
 
 
 @st.cache_data
-def preprocess_data(df, cache_version="v2.0"):
+def preprocess_data(df, cache_version="v2.1"):
     """Preprocess the data with value labels and clean missing values."""
     df_processed = df.copy()
     
