@@ -9,17 +9,6 @@ from utils.data_loader import get_filtered_data
 def render_sidebar_filters(df_processed):
     """Render sidebar filters and return filtered data."""
     with st.sidebar:
-        # Initialize session state for multi-select filters
-        if 'country_filter_selected' not in st.session_state:
-            # Default: both countries selected
-            st.session_state.country_filter_selected = ['NL', 'UK']
-        if 'age_filter_selected' not in st.session_state:
-            st.session_state.age_filter_selected = []
-        if 'gender_filter_selected' not in st.session_state:
-            st.session_state.gender_filter_selected = []
-        if 'usage_filter_selected' not in st.session_state:
-            st.session_state.usage_filter_selected = []
-        
         # Country filter - Multi-select with checkboxes
         st.write("**Country**")
         # Get available countries from data
@@ -30,14 +19,13 @@ def render_sidebar_filters(df_processed):
         
         for country in country_options:
             checkbox_key = f'country_checkbox_{country}'
-            # Initialize checkbox state if not exists (default: both selected)
+            # Set default value only if key doesn't exist yet
             if checkbox_key not in st.session_state:
-                st.session_state[checkbox_key] = True
+                st.session_state[checkbox_key] = True  # Default: both selected
             
-            # Show checkbox (always show both, even if data doesn't exist)
+            # Show checkbox - let Streamlit manage state via key
             checked = st.checkbox(
                 country,
-                value=st.session_state[checkbox_key],
                 key=checkbox_key,
                 label_visibility="visible"
             )
@@ -45,8 +33,6 @@ def render_sidebar_filters(df_processed):
             # Only add to filter if checked AND country exists in data
             if checked and country in available_countries:
                 country_filter_selected.append(country)
-        
-        st.session_state.country_filter_selected = country_filter_selected
         
         # Show active filter count
         if len(country_filter_selected) > 0:
@@ -63,16 +49,15 @@ def render_sidebar_filters(df_processed):
         for age in age_options:
             checkbox_key = f'age_checkbox_{age}'
             if checkbox_key not in st.session_state:
-                st.session_state[checkbox_key] = False
+                st.session_state[checkbox_key] = False  # Default: not selected
+            
             checked = st.checkbox(
                 age,
-                value=st.session_state[checkbox_key],
                 key=checkbox_key,
                 label_visibility="visible"
             )
             if checked:
                 age_filter_selected.append(age)
-        st.session_state.age_filter_selected = age_filter_selected
         
         # Show active filter count
         if len(age_filter_selected) > 0:
@@ -89,16 +74,15 @@ def render_sidebar_filters(df_processed):
         for gender in gender_options:
             checkbox_key = f'gender_checkbox_{gender}'
             if checkbox_key not in st.session_state:
-                st.session_state[checkbox_key] = False
+                st.session_state[checkbox_key] = False  # Default: not selected
+            
             checked = st.checkbox(
                 gender,
-                value=st.session_state[checkbox_key],
                 key=checkbox_key,
                 label_visibility="visible"
             )
             if checked:
                 gender_filter_selected.append(gender)
-        st.session_state.gender_filter_selected = gender_filter_selected
         
         # Show active filter count
         if len(gender_filter_selected) > 0:
@@ -115,16 +99,15 @@ def render_sidebar_filters(df_processed):
         for usage in usage_options:
             checkbox_key = f'usage_checkbox_{usage}'
             if checkbox_key not in st.session_state:
-                st.session_state[checkbox_key] = False
+                st.session_state[checkbox_key] = False  # Default: not selected
+            
             checked = st.checkbox(
                 usage,
-                value=st.session_state[checkbox_key],
                 key=checkbox_key,
                 label_visibility="visible"
             )
             if checked:
                 usage_filter_selected.append(usage)
-        st.session_state.usage_filter_selected = usage_filter_selected
         
         # Show active filter count
         if len(usage_filter_selected) > 0:
@@ -148,21 +131,16 @@ def render_sidebar_filters(df_processed):
         
         # Reset button
         if st.button("Reset Filters", use_container_width=True, key='reset_filters'):
-            # Clear all filter-related session state
-            keys_to_delete = []
-            for key in st.session_state.keys():
-                if (key.startswith('country_checkbox_') or 
-                    key.startswith('age_checkbox_') or 
-                    key.startswith('gender_checkbox_') or 
-                    key.startswith('usage_checkbox_') or
-                    key in ['country_filter_selected', 'age_filter_selected', 
-                           'gender_filter_selected', 'usage_filter_selected']):
-                    keys_to_delete.append(key)
-            
-            for key in keys_to_delete:
-                del st.session_state[key]
-            
+            # Reset country checkboxes to True (default)
+            for country in country_options:
+                st.session_state[f'country_checkbox_{country}'] = True
+            # Reset other checkboxes to False
+            for age in age_options:
+                st.session_state[f'age_checkbox_{age}'] = False
+            for gender in gender_options:
+                st.session_state[f'gender_checkbox_{gender}'] = False
+            for usage in usage_options:
+                st.session_state[f'usage_checkbox_{usage}'] = False
             st.rerun()
     
     return df_filtered
-
