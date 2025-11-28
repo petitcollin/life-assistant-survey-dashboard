@@ -108,7 +108,7 @@ LIKERT_LABELS = {
 
 
 @st.cache_data
-def load_data(cache_version="v2.2"):
+def load_data(cache_version="v2.3"):
     """Load the survey data from Excel files (both NL and UK datasets)."""
     dfs = []
     
@@ -178,7 +178,7 @@ def load_data(cache_version="v2.2"):
 
 
 @st.cache_data
-def preprocess_data(df, cache_version="v2.2"):
+def preprocess_data(df, cache_version="v2.3"):
     """Preprocess the data with value labels and clean missing values."""
     df_processed = df.copy()
     
