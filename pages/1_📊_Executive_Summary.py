@@ -18,111 +18,80 @@ We gathered responses from **{:,} participants** across the Netherlands and the 
 
 st.markdown("---")
 
-# Key Metrics Row
-st.subheader("💡 Key Insights at a Glance")
+# Key Metrics
+st.subheader("💡 Key Insights")
 
 total = len(df)
 
-# Row 1: Adoption & Comfort
-col1, col2, col3 = st.columns(3)
+# Row 1
+col1, col2 = st.columns(2)
 
 with col1:
     if 'Q5_1' in df.columns:
         comfortable = len(df[df['Q5_1'].isin([4, 5])])
         pct = comfortable / total * 100 if total > 0 else 0
-        st.metric(
-            label="Open to Proactive AI",
-            value=f"{pct:.0f}%",
-            help="Respondents rating 4-5 on comfort with proactive AI assistants"
-        )
+        st.metric(label="Open to Proactive AI", value=f"{pct:.0f}%")
+        st.caption("Would feel comfortable using an AI assistant that proactively helps manage their daily life")
 
 with col2:
     if 'Q7_1' in df.columns:
         uncomfortable = len(df[df['Q7_1'].isin([1, 2])])
         pct = uncomfortable / total * 100 if total > 0 else 0
-        st.metric(
-            label="Privacy Concerned",
-            value=f"{pct:.0f}%",
-            help="Uncomfortable with AI accessing calendar/email (rating 1-2)"
-        )
+        st.metric(label="Privacy Concerned", value=f"{pct:.0f}%")
+        st.caption("Are uncomfortable with an AI assistant connecting to their calendar and email")
 
-with col3:
+st.markdown("")
+
+# Row 2
+col1, col2 = st.columns(2)
+
+with col1:
     if 'Q3' in df.columns:
         daily = len(df[df['Q3'] == 'Daily'])
         pct = daily / total * 100 if total > 0 else 0
-        st.metric(
-            label="Daily AI Users",
-            value=f"{pct:.0f}%",
-            help="Respondents who use AI tools daily"
-        )
+        st.metric(label="Daily AI Users", value=f"{pct:.0f}%")
+        st.caption("Already use AI tools on a daily basis")
 
-# Row 2: Preferences
-col1, col2, col3 = st.columns(3)
+with col2:
+    if 'Q9_1' in df.columns:
+        uncomfortable = len(df[df['Q9_1'].isin([1, 2])])
+        pct = uncomfortable / total * 100 if total > 0 else 0
+        st.metric(label="Uncomfortable in Public", value=f"{pct:.0f}%")
+        st.caption("Would feel uncomfortable speaking to an AI assistant in public")
+
+st.markdown("")
+
+# Row 3
+col1, col2 = st.columns(2)
 
 with col1:
     if 'Q8' in df.columns:
         text_only = len(df[df['Q8'] == 'Text only'])
         pct = text_only / total * 100 if total > 0 else 0
-        st.metric(
-            label="Prefer Text Only",
-            value=f"{pct:.0f}%",
-            help="Prefer text over voice interaction"
-        )
+        st.metric(label="Prefer Text Only", value=f"{pct:.0f}%")
+        st.caption("Prefer interacting with AI through text rather than voice")
 
 with col2:
     if 'Q12' in df.columns:
         with_me = len(df[df['Q12'] == 'Do it with me (helpful partner)'])
         pct = with_me / total * 100 if total > 0 else 0
-        st.metric(
-            label="Want Collaborative AI",
-            value=f"{pct:.0f}%",
-            help="Prefer 'do it with me' over full automation"
-        )
-
-with col3:
-    if 'Q9_1' in df.columns:
-        uncomfortable = len(df[df['Q9_1'].isin([1, 2])])
-        pct = uncomfortable / total * 100 if total > 0 else 0
-        st.metric(
-            label="Uncomfortable in Public",
-            value=f"{pct:.0f}%",
-            help="Uncomfortable speaking to AI in public (rating 1-2)"
-        )
+        st.metric(label="Want Collaborative AI", value=f"{pct:.0f}%")
+        st.caption("Prefer AI to work with them as a partner rather than fully automating tasks")
 
 st.markdown("---")
 
-# Biggest Opportunity
-st.subheader("📈 Biggest Opportunity")
+# Key Findings
+st.subheader("🔍 Key Findings")
 
-from utils.data_loader import get_multiple_choice_counts, Q4_LABELS, Q6_LABELS
+col1, col2 = st.columns(2)
 
-q4_counts = get_multiple_choice_counts(df, 'Q4_', Q4_LABELS)
-q6_counts = get_multiple_choice_counts(df, 'Q6_', Q6_LABELS)
+with col1:
+    st.markdown("**🍽️ Biggest Pain Point**")
+    st.info("**Meal planning and cooking** is the most mentioned task people want help with — deciding what to eat, finding recipes, and making grocery lists.")
 
-if len(q4_counts) > 0 and len(q6_counts) > 0:
-    q4_dict = q4_counts.to_dict()
-    q6_dict = q6_counts.to_dict()
-    gaps = {}
-    for feature in set(list(q4_dict.keys()) + list(q6_dict.keys())):
-        current = q4_dict.get(feature, 0)
-        desired = q6_dict.get(feature, 0)
-        gap = desired - current
-        if gap > 0:
-            gaps[feature] = (gap, current, desired)
-    
-    if gaps:
-        top_gap = max(gaps.items(), key=lambda x: x[1][0])
-        feature_name = top_gap[0]
-        gap, current, desired = top_gap[1]
-        
-        col1, col2, col3 = st.columns([2, 1, 1])
-        with col1:
-            st.markdown(f"**{feature_name}**")
-            st.caption("Largest gap between desired and current usage")
-        with col2:
-            st.metric("Current", current)
-        with col3:
-            st.metric("Desired", desired, delta=f"+{gap}")
+with col2:
+    st.markdown("**📈 Biggest Opportunity**")
+    st.info("**Discovering new music, movies, books, or content** shows the largest gap between current usage and desired features — an untapped area for AI assistance.")
 
 st.markdown("---")
 
