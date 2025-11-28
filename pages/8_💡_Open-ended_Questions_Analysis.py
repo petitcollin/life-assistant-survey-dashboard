@@ -1,13 +1,9 @@
 """
-Insights & Analysis Page
+Open-ended Questions Analysis Page
 """
 import streamlit as st
 from utils.page_utils import init_page
 import pandas as pd
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
-from collections import Counter
-import re
 from utils.text_categorizer import (
     categorize_responses,
     get_sample_responses_by_category,
@@ -21,183 +17,161 @@ from utils.charts import create_bar_chart
 df = init_page()
 
 st.title("💡 Open-ended Questions Analysis")
+st.markdown("""
+Analysis of free-text responses where participants described their needs and expectations 
+for AI assistance in their daily lives.
+""")
 st.markdown("---")
 
-# Text Analysis
-st.subheader("Text Response Analysis")
-
-def analyze_text_responses_english(df, column='Q13'):
-    """Analyze English text responses from pre-translated columns."""
-    # Use the English column directly
-    english_column = f"{column}_english"
-    
-    if english_column not in df.columns:
-        # Fallback to original if English doesn't exist
-        if column in df.columns:
-            english_column = column
-        else:
-            return None
-    
-    # Get responses
-    responses = df[english_column].dropna().astype(str).tolist()
-    
-    # Filter out empty/invalid responses
-    valid_responses = [r for r in responses if r and r.lower() not in ['nan', 'none', '']]
-    
-    if not valid_responses:
-        return None
-    
-    # Word frequency analysis
-    all_words = []
-    for response in valid_responses:
-        words = re.findall(r'\b\w+\b', response.lower())
-        # Filter out common stop words
-        stop_words = {
-            'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 
-            'of', 'with', 'by', 'this', 'that', 'these', 'those', 'would', 'could', 
-            'should', 'from', 'have', 'has', 'had', 'was', 'were', 'been', 'being', 
-            'are', 'is', 'am', 'be', 'do', 'does', 'did', 'will', 'can', 'may', 
-            'might', 'must', 'shall', 'want', 'wants', 'need', 'needs', 'get', 
-            'gets', 'got', 'make', 'makes', 'made', 'help', 'helps', 'assistant'
-        }
-        words = [w for w in words if len(w) > 3 and w not in stop_words]
-        all_words.extend(words)
-    
-    word_freq = Counter(all_words)
-    top_words = word_freq.most_common(20)
-    
-    return {
-        'total_responses': len(valid_responses),
-        'top_words': top_words,
-        'sample_responses': valid_responses[:10]
-    }
-
-tab1, tab2, tab3, tab4 = st.tabs(["Q13 - Time-consuming Tasks", "Q14 - Why Frustrating/Time-consuming", "Q15 - How AI Should Help", "Raw Data"])
+tab1, tab2, tab3, tab4 = st.tabs([
+    "🎯 Tasks for AI Help", 
+    "😤 Why Frustrating", 
+    "🤖 How AI Should Help", 
+    "📄 Raw Data"
+])
 
 with tab1:
-    st.write("**What time-consuming or repetitive tasks would you want a digital AI assistant to help with?**")
+    st.subheader("What tasks would you want an AI assistant to help with?")
+    st.caption("Q13: What time-consuming or repetitive tasks in your daily life would you want a digital AI assistant to help you with?")
     
-    # Categorization
-    st.subheader("Response Categories")
     q13_categories = categorize_responses(df, 'Q13', Q13_CATEGORIES)
     if q13_categories:
-        # Sort by count descending (most to least)
+        # Sort by count descending
         q13_categories_sorted = dict(sorted(q13_categories.items(), key=lambda x: x[1], reverse=True))
         q13_cat_series = pd.Series(q13_categories_sorted)
         
-        # Create bar chart (sorted from most to least)
+        # Key insight
+        top_category = list(q13_categories_sorted.keys())[0]
+        top_count = list(q13_categories_sorted.values())[0]
+        if top_category != "Nothing / Don't know":
+            # Find top non-nothing category
+            for cat, cnt in q13_categories_sorted.items():
+                if cat not in ["Nothing / Don't know", "Other"]:
+                    top_category = cat
+                    top_count = cnt
+                    break
+        
+        st.info(f"**Top task:** {top_category} — mentioned by {top_count} respondents ({top_count/len(df)*100:.1f}%)")
+        
+        # Bar chart
         fig = create_bar_chart(q13_cat_series, title="", orientation='h', show_percentage=True, total_responses=len(df))
+        fig.update_layout(height=450)
         st.plotly_chart(fig, use_container_width=True)
         
-        # Show sample responses per category
-        st.subheader("Sample Responses by Category")
-        q13_samples = get_sample_responses_by_category(df, 'Q13', Q13_CATEGORIES, num_samples=3)
-        
-        # Display samples in order of category frequency (most to least)
-        for category in q13_categories_sorted.keys():
-            if category in q13_samples and len(q13_samples[category]) > 0:
-                st.write(f"**{category}** ({q13_categories_sorted[category]} responses):")
-                for i, response in enumerate(q13_samples[category], 1):
-                    st.write(f"  {i}. {response}")
-                st.write("")
+        # Sample responses (collapsed by default)
+        with st.expander("📝 View sample responses by category"):
+            q13_samples = get_sample_responses_by_category(df, 'Q13', Q13_CATEGORIES, num_samples=3)
+            for category in q13_categories_sorted.keys():
+                if category in q13_samples and len(q13_samples[category]) > 0:
+                    st.markdown(f"**{category}** ({q13_categories_sorted[category]} responses)")
+                    for response in q13_samples[category]:
+                        st.markdown(f"- _{response}_")
+                    st.markdown("")
     else:
         st.info("No data available for Q13.")
 
 with tab2:
-    st.write("**Why do you find these tasks frustrating or time-consuming?**")
+    st.subheader("Why are these tasks frustrating or time-consuming?")
+    st.caption("Q14: Why do you find these tasks frustrating or time-consuming?")
     
-    # Categorization
-    st.subheader("Response Categories")
     q14_categories = categorize_responses(df, 'Q14', Q14_CATEGORIES)
     if q14_categories:
-        # Sort by count descending (most to least)
+        # Sort by count descending
         q14_categories_sorted = dict(sorted(q14_categories.items(), key=lambda x: x[1], reverse=True))
         q14_cat_series = pd.Series(q14_categories_sorted)
         
-        # Create bar chart (sorted from most to least)
+        # Key insight
+        for cat, cnt in q14_categories_sorted.items():
+            if cat not in ["Nothing / Don't know", "Other"]:
+                st.info(f"**Top reason:** {cat} — mentioned by {cnt} respondents ({cnt/len(df)*100:.1f}%)")
+                break
+        
+        # Bar chart
         fig = create_bar_chart(q14_cat_series, title="", orientation='h', show_percentage=True, total_responses=len(df))
+        fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True)
         
-        # Show sample responses per category
-        st.subheader("Sample Responses by Category")
-        q14_samples = get_sample_responses_by_category(df, 'Q14', Q14_CATEGORIES, num_samples=3)
-        
-        # Display samples in order of category frequency (most to least)
-        for category in q14_categories_sorted.keys():
-            if category in q14_samples and len(q14_samples[category]) > 0:
-                st.write(f"**{category}** ({q14_categories_sorted[category]} responses):")
-                for i, response in enumerate(q14_samples[category], 1):
-                    st.write(f"  {i}. {response}")
-                st.write("")
+        # Sample responses
+        with st.expander("📝 View sample responses by category"):
+            q14_samples = get_sample_responses_by_category(df, 'Q14', Q14_CATEGORIES, num_samples=3)
+            for category in q14_categories_sorted.keys():
+                if category in q14_samples and len(q14_samples[category]) > 0:
+                    st.markdown(f"**{category}** ({q14_categories_sorted[category]} responses)")
+                    for response in q14_samples[category]:
+                        st.markdown(f"- _{response}_")
+                    st.markdown("")
     else:
-        st.info("No responses available for Q14.")
+        st.info("No data available for Q14.")
 
 with tab3:
-    st.write("**How would you expect an AI assistant to help with these tasks?**")
+    st.subheader("How should an AI assistant help?")
+    st.caption("Q15: How would you expect an AI assistant to help with these tasks?")
     
-    # Categorization
-    st.subheader("Response Categories")
     q15_categories = categorize_responses(df, 'Q15', Q15_CATEGORIES)
     if q15_categories:
-        # Sort by count descending (most to least)
+        # Sort by count descending
         q15_categories_sorted = dict(sorted(q15_categories.items(), key=lambda x: x[1], reverse=True))
         q15_cat_series = pd.Series(q15_categories_sorted)
         
-        # Create bar chart (sorted from most to least)
+        # Key insight
+        for cat, cnt in q15_categories_sorted.items():
+            if cat not in ["Nothing / Don't know", "Other"]:
+                st.info(f"**Top expectation:** {cat} — mentioned by {cnt} respondents ({cnt/len(df)*100:.1f}%)")
+                break
+        
+        # Bar chart
         fig = create_bar_chart(q15_cat_series, title="", orientation='h', show_percentage=True, total_responses=len(df))
+        fig.update_layout(height=400)
         st.plotly_chart(fig, use_container_width=True)
         
-        # Show sample responses per category
-        st.subheader("Sample Responses by Category")
-        q15_samples = get_sample_responses_by_category(df, 'Q15', Q15_CATEGORIES, num_samples=3)
-        
-        # Display samples in order of category frequency (most to least)
-        for category in q15_categories_sorted.keys():
-            if category in q15_samples and len(q15_samples[category]) > 0:
-                st.write(f"**{category}** ({q15_categories_sorted[category]} responses):")
-                for i, response in enumerate(q15_samples[category], 1):
-                    st.write(f"  {i}. {response}")
-                st.write("")
+        # Sample responses
+        with st.expander("📝 View sample responses by category"):
+            q15_samples = get_sample_responses_by_category(df, 'Q15', Q15_CATEGORIES, num_samples=3)
+            for category in q15_categories_sorted.keys():
+                if category in q15_samples and len(q15_samples[category]) > 0:
+                    st.markdown(f"**{category}** ({q15_categories_sorted[category]} responses)")
+                    for response in q15_samples[category]:
+                        st.markdown(f"- _{response}_")
+                    st.markdown("")
     else:
-        st.info("No responses available for Q15.")
+        st.info("No data available for Q15.")
 
 with tab4:
-    st.write("**Raw Data - Q13, Q14, Q15 (English)**")
+    st.subheader("Raw Responses")
+    st.caption("All open-ended responses (Q13, Q14, Q15)")
     
-    # Create a dataframe with just the three English columns
+    # Build dataframe with available columns
     raw_data_columns = []
     column_names = []
     
-    if 'Q13_english' in df.columns:
-        raw_data_columns.append(df['Q13_english'])
-        column_names.append('Q13 - Time-consuming Tasks')
-    elif 'Q13' in df.columns:
-        raw_data_columns.append(df['Q13'])
-        column_names.append('Q13 - Time-consuming Tasks')
-    
-    if 'Q14_english' in df.columns:
-        raw_data_columns.append(df['Q14_english'])
-        column_names.append('Q14 - Why Frustrating/Time-consuming')
-    elif 'Q14' in df.columns:
-        raw_data_columns.append(df['Q14'])
-        column_names.append('Q14 - Why Frustrating/Time-consuming')
-    
-    if 'Q15_english' in df.columns:
-        raw_data_columns.append(df['Q15_english'])
-        column_names.append('Q15 - How AI Should Help')
-    elif 'Q15' in df.columns:
-        raw_data_columns.append(df['Q15'])
-        column_names.append('Q15 - How AI Should Help')
+    for q, label in [
+        ('Q13', 'Q13 - Tasks for AI Help'),
+        ('Q14', 'Q14 - Why Frustrating'),
+        ('Q15', 'Q15 - How AI Should Help')
+    ]:
+        english_col = f"{q}_english"
+        if english_col in df.columns:
+            raw_data_columns.append(df[english_col])
+            column_names.append(label)
+        elif q in df.columns:
+            raw_data_columns.append(df[q])
+            column_names.append(label)
     
     if raw_data_columns:
         raw_df = pd.concat(raw_data_columns, axis=1)
         raw_df.columns = column_names
-        
-        # Filter out rows where all three columns are empty/NaN
         raw_df = raw_df.dropna(how='all')
         
-        st.dataframe(raw_df, use_container_width=True, hide_index=False)
-        st.write(f"**Total rows:** {len(raw_df)}")
+        # Add search/filter
+        search_term = st.text_input("🔍 Search responses", placeholder="Type to filter...")
+        
+        if search_term:
+            mask = raw_df.apply(lambda row: row.astype(str).str.contains(search_term, case=False, na=False).any(), axis=1)
+            filtered_df = raw_df[mask]
+            st.write(f"**Found {len(filtered_df)} matching responses**")
+            st.dataframe(filtered_df, use_container_width=True, height=400)
+        else:
+            st.write(f"**Total responses:** {len(raw_df)}")
+            st.dataframe(raw_df, use_container_width=True, height=400)
     else:
-        st.warning("No English columns found for Q13, Q14, or Q15.")
-
+        st.warning("No open-ended response columns found.")

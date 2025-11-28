@@ -1,51 +1,54 @@
 """
 Text categorization utilities for survey responses.
+Refined categories based on analysis of ~2000 responses.
 """
 import re
 from typing import List, Dict, Tuple
 
-# Category definitions with keywords
+# Q13: What time-consuming or repetitive tasks would you want an AI assistant to help with?
 Q13_CATEGORIES = {
-    "Doesn't know / No response": ["don't know", "no idea", "nothing", "none", "n/a", "na", ""],
-    "Doesn't want to use AI": ["don't want", "not interested", "no need", "don't need", "not want"],
-    "Travel booking / Planning trips": ["travel", "trip", "booking", "flight", "hotel", "vacation", "holiday", "itinerary", "destination"],
-    "Learning / Studying": ["learn", "study", "studying", "education", "course", "training", "skill", "language", "reading"],
-    "Budgeting / Financial management": ["budget", "money", "expense", "financial", "finance", "spending", "saving", "bill", "payment", "accounting"],
-    "Food / Meal planning": ["food", "meal", "recipe", "cooking", "grocery", "shopping food", "dinner", "lunch", "breakfast", "eating"],
-    "Scheduling / Calendar / Time management": ["schedule", "calendar", "appointment", "meeting", "time management", "organize day", "planning day", "agenda"],
-    "Shopping / Product comparison": ["shopping", "buy", "purchase", "product", "compare", "price", "online shopping"],
-    "Health / Fitness / Wellness": ["health", "fitness", "exercise", "workout", "wellness", "doctor", "medical", "diet", "nutrition"],
-    "Home projects / DIY": ["home", "diy", "project", "repair", "maintenance", "house", "cleaning", "organize home"],
-    "Email / Communication": ["email", "message", "communication", "reply", "inbox", "mail"],
-    "Research / Information gathering": ["research", "information", "find", "search", "look up", "gather"],
-    "Social / Relationship": ["social", "relationship", "friend", "dating", "conversation"],
-    "Work / Professional tasks": ["work", "job", "professional", "task", "project work", "report", "presentation"],
-    "Entertainment / Content discovery": ["music", "movie", "book", "entertainment", "content", "discover"],
-    "Other": []  # Catch-all for unmatched responses
-}
-
-Q14_CATEGORIES = {
-    "Doesn't know / No response": ["don't know", "no idea", "nothing", "none", "n/a", "na", ""],
-    "Time-consuming": ["time", "takes long", "long time", "time consuming", "too much time", "waste time"],
-    "Repetitive / Boring": ["repetitive", "boring", "monotonous", "tedious", "same thing", "over and over"],
-    "Complex / Difficult": ["complex", "difficult", "hard", "complicated", "confusing", "challenging"],
-    "Overwhelming / Too many options": ["overwhelming", "too many", "options", "choices", "decisions"],
-    "Lack of knowledge / Skills": ["don't know how", "lack knowledge", "no skill", "inexperience"],
-    "Administrative burden": ["paperwork", "admin", "administrative", "forms", "documentation"],
-    "Decision fatigue": ["decisions", "decide", "choice", "choose", "decision fatigue"],
+    "Nothing / Don't know": ["nothing", "none", "n/a", "na", "dont know", "don't know", "no idea", "not sure", "can't think", "cant think", "not applicable", "no answer", "not really"],
+    "Meal planning / Cooking / Recipes": ["meal", "cook", "recipe", "food", "dinner", "lunch", "breakfast", "grocery", "groceries", "shopping list", "menu", "eat", "what to have"],
+    "Work / Professional tasks": ["work", "job", "office", "meeting", "project", "business", "professional", "report", "presentation", "colleague"],
+    "Scheduling / Calendar / Planning": ["schedule", "calendar", "appointment", "planning my", "organiz", "organis", "diary", "agenda", "time management"],
+    "Research / Information gathering": ["research", "compar", "information", "search for", "looking for", "finding", "look up", "gather info"],
+    "Email / Messages / Communication": ["email", "e-mail", "inbox", "mail", "messages", "messaging", "reply", "respond"],
+    "Finances / Budget / Expenses": ["finance", "financ", "money", "budget", "expense", "bank", "tax", "taxes", "bills", "payment", "saving", "accounting"],
+    "Admin / Paperwork / Forms": ["admin", "paperwork", "document", "forms", "bureaucra", "filing", "insurance", "government"],
+    "Shopping / Comparing products": ["shop", "buy", "purchase", "order", "online shop", "product", "price"],
+    "Cleaning / Housework / Chores": ["clean", "housework", "household", "chores", "laundry", "tidy", "tidying", "vacuum", "washing"],
+    "Travel / Trips / Booking": ["travel", "trip", "holiday", "vacation", "flight", "booking", "hotel", "destination"],
+    "Health / Medical / Fitness": ["health", "medical", "doctor", "fitness", "exercise", "gym", "wellness", "diet"],
+    "Learning / Studying": ["learn", "study", "education", "course", "training", "skill", "language"],
     "Other": []
 }
 
+# Q14: Why do you find these tasks frustrating or time-consuming?
+Q14_CATEGORIES = {
+    "Nothing / Don't know": ["nothing", "none", "n/a", "na", "dont know", "don't know", "no idea", "not sure", "not applicable"],
+    "Time-consuming / Takes too long": ["time", "takes long", "long time", "time consuming", "too much time", "hours", "slow", "duration"],
+    "Repetitive / Boring / Tedious": ["repetitive", "boring", "monotonous", "tedious", "same thing", "over and over", "dull", "routine", "mundane"],
+    "Complex / Difficult": ["complex", "difficult", "hard", "complicated", "confusing", "challenging", "tricky"],
+    "Overwhelming / Too much": ["overwhelming", "too many", "too much", "overload", "stress", "pressure"],
+    "Lack of interest / Motivation": ["interest", "motivation", "enjoy", "like doing", "hate", "dislike", "not fun", "annoying"],
+    "Requires effort / Energy": ["effort", "energy", "tiring", "exhausting", "draining", "mental", "concentration"],
+    "Forgetting / Hard to track": ["forget", "remember", "memory", "keep track", "lose track", "oversight"],
+    "Decision fatigue": ["decision", "decide", "choice", "choose", "options", "what to"],
+    "Other": []
+}
+
+# Q15: How would you expect an AI assistant to help with these tasks?
 Q15_CATEGORIES = {
-    "Doesn't know / No response": ["don't know", "no idea", "nothing", "none", "n/a", "na", ""],
-    "Automate / Do it for me": ["automate", "automatic", "do it for me", "handle", "take care", "complete"],
-    "Organize / Structure": ["organize", "structure", "arrange", "sort", "categorize"],
-    "Remind / Notify": ["remind", "notification", "alert", "notify", "remember"],
-    "Research / Find information": ["research", "find", "search", "look up", "gather", "information"],
-    "Plan / Schedule": ["plan", "schedule", "arrange", "coordinate", "organize time"],
-    "Compare / Analyze": ["compare", "analyze", "evaluate", "review", "assess"],
-    "Simplify / Streamline": ["simplify", "streamline", "make easier", "reduce", "minimize"],
-    "Learn / Teach": ["learn", "teach", "explain", "guide", "help understand"],
+    "Nothing / Don't know": ["nothing", "none", "n/a", "na", "dont know", "don't know", "no idea", "not sure"],
+    "Provide suggestions / Recommendations": ["suggest", "suggestion", "option", "recommend", "idea", "proposal", "advice", "tip"],
+    "Search / Research / Find information": ["search", "research", "find", "look up", "gather", "information", "answer"],
+    "Save time / Make faster": ["save time", "faster", "quick", "speed", "efficient", "less time"],
+    "Organize / Plan / Schedule": ["organize", "plan", "schedule", "arrange", "structure", "manage", "coordinate"],
+    "Create / Generate content": ["create", "generate", "make", "produce", "write", "draft", "compose"],
+    "Automate / Do it for me": ["automate", "automatic", "do it for me", "take over", "handle", "complete", "do the"],
+    "Remind / Notify": ["remind", "notification", "alert", "notify", "remember", "prompt"],
+    "Simplify / Make easier": ["easier", "simple", "simplify", "easy", "less effort", "streamline"],
+    "Compare / Analyze": ["compare", "analyze", "evaluate", "review", "assess", "calculate"],
     "Other": []
 }
 
@@ -64,21 +67,22 @@ def categorize_text(text: str, categories: Dict[str, List[str]]) -> str:
     import pandas as pd
     
     if not text or (isinstance(text, float) and pd.isna(text)) or str(text).lower().strip() in ['nan', 'none', '']:
-        return "Doesn't know / No response"
+        return "Nothing / Don't know"
     
     text_lower = str(text).lower()
     
-    # Check each category (excluding "Other" and "Doesn't know")
+    # Check for "Nothing / Don't know" patterns first
+    nothing_keywords = categories.get("Nothing / Don't know", [])
+    if any(keyword in text_lower for keyword in nothing_keywords):
+        return "Nothing / Don't know"
+    
+    # Check each category (excluding "Other" and "Nothing / Don't know")
     for category, keywords in categories.items():
-        if category in ["Other", "Doesn't know / No response"]:
+        if category in ["Other", "Nothing / Don't know"]:
             continue
         for keyword in keywords:
             if keyword in text_lower:
                 return category
-    
-    # Check for "Doesn't know" patterns
-    if any(keyword in text_lower for keyword in categories.get("Doesn't know / No response", [])):
-        return "Doesn't know / No response"
     
     # Default to "Other"
     return "Other"
@@ -98,7 +102,7 @@ def categorize_responses(df, column_prefix: str, categories: Dict[str, List[str]
     """
     import pandas as pd
     
-    # Try English column first
+    # Try English column first, then original column
     english_column = f"{column_prefix}_english"
     if english_column in df.columns:
         column = english_column
@@ -134,7 +138,7 @@ def get_sample_responses_by_category(df, column_prefix: str, categories: Dict[st
     """
     import pandas as pd
     
-    # Try English column first
+    # Try English column first, then original column
     english_column = f"{column_prefix}_english"
     if english_column in df.columns:
         column = english_column
@@ -147,19 +151,23 @@ def get_sample_responses_by_category(df, column_prefix: str, categories: Dict[st
     responses = df[column].dropna().astype(str)
     
     # Filter out invalid responses
-    valid_responses = responses[responses.str.lower().str.strip().isin(['nan', 'none', '']) == False]
+    valid_responses = responses[~responses.str.lower().str.strip().isin(['nan', 'none', ''])]
     
     # Categorize and group responses
     category_responses = {}
     for idx, response in valid_responses.items():
+        # Filter out very short responses
+        if len(str(response).strip()) < 5:
+            continue
         category = categorize_text(response, categories)
         if category not in category_responses:
             category_responses[category] = []
-        category_responses[category].append(str(response))
+        # Only add if not too long and somewhat informative
+        if len(response) < 300:
+            category_responses[category].append(str(response))
     
     # Limit to num_samples per category
     for category in category_responses:
         category_responses[category] = category_responses[category][:num_samples]
     
     return category_responses
-
