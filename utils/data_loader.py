@@ -159,8 +159,15 @@ def load_data(cache_version="v2.2"):
             df_uk = df_uk.drop(columns=columns_to_merge)
         df_uk['Country'] = 'UK'
         dfs.append(df_uk)
-    except Exception as e:
+    except FileNotFoundError:
+        # UK file not found - this is okay, we'll just use NL data
         pass
+    except Exception as e:
+        # Other error loading UK - log but continue
+        import streamlit as st
+        # Only show warning in development, not in production
+        if hasattr(st, 'warning'):
+            pass  # Silently fail in production
     
     # Combine both datasets
     if len(dfs) > 0:

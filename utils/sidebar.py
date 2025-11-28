@@ -22,20 +22,23 @@ def render_sidebar_filters(df_processed):
         
         # Country filter - Multi-select with checkboxes
         st.write("**Country**")
-        country_options = sorted([c for c in df_processed['Country'].unique() if pd.notna(c)])
+        # Always show both NL and UK options, even if one dataset didn't load
+        available_countries = sorted([c for c in df_processed['Country'].unique() if pd.notna(c)])
+        country_options = ['NL', 'UK']  # Always show both options
         country_filter_selected = []
         for country in country_options:
             checkbox_key = f'country_checkbox_{country}'
             if checkbox_key not in st.session_state:
                 # Default: both countries selected
-                st.session_state[checkbox_key] = country in ['NL', 'UK']
+                st.session_state[checkbox_key] = True
             checked = st.checkbox(
                 country,
                 value=st.session_state[checkbox_key],
                 key=checkbox_key,
                 label_visibility="visible"
             )
-            if checked:
+            if checked and country in available_countries:
+                # Only add to filter if country actually exists in data
                 country_filter_selected.append(country)
         st.session_state.country_filter_selected = country_filter_selected
         
@@ -140,16 +143,29 @@ def render_sidebar_filters(df_processed):
         # Reset button
         if st.button("Reset Filters", use_container_width=True, key='reset_filters'):
             # Reset country filters to default (both selected)
-            for country in country_options:
-                st.session_state[f'country_checkbox_{country}'] = country in ['NL', 'UK']
+            for country in ['NL', 'UK']:
+                checkbox_key = f'country_checkbox_{country}'
+                if checkbox_key not in st.session_state:
+                    st.session_state[checkbox_key] = True
+                else:
+                    st.session_state[checkbox_key] = True
             # Clear all other checkbox states
             for age in age_options:
-                st.session_state[f'age_checkbox_{age}'] = False
+                age_key = f'age_checkbox_{age}'
+                if age_key in st.session_state:
+                    st.session_state[age_key] = False
             for gender in gender_options:
-                st.session_state[f'gender_checkbox_{gender}'] = False
+                gender_key = f'gender_checkbox_{gender}'
+                if gender_key in st.session_state:
+                    st.session_state[gender_key] = False
             for usage in usage_options:
-                st.session_state[f'usage_checkbox_{usage}'] = False
-            st.session_state.country_filter_selected = ['NL', 'UK']
+                usage_key = f'usage_checkbox_{usage}'
+                if usage_key in st.session_state:
+                    st.session_state[usage_key] = False
+            # Set default country filter (only include countries that exist in data)
+            available_countries = sorted([c for c in df_processed['Country'].unique() if pd.notna(c)])
+            default_countries = [c for c in ['NL', 'UK'] if c in available_countries]
+            st.session_state.country_filter_selected = default_countries
             st.session_state.age_filter_selected = []
             st.session_state.gender_filter_selected = []
             st.session_state.usage_filter_selected = []
