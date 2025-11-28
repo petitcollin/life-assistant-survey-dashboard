@@ -9,6 +9,14 @@ from utils.insights import get_top_motivators, get_top_barriers, generate_key_in
 df = init_page()
 
 st.title("📊 Executive Summary")
+
+# Survey Introduction
+st.markdown("""
+This survey explores attitudes toward AI-powered personal assistants that help manage daily life tasks. 
+We gathered responses from **{:,} participants** across the Netherlands and the United Kingdom to understand 
+current AI usage, comfort levels with proactive AI assistance, and key motivators and barriers to adoption.
+""".format(len(df)))
+
 st.markdown("---")
 
 # Key Insights

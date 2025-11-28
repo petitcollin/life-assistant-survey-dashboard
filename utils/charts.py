@@ -136,9 +136,7 @@ def create_likert_chart(data, title="", labels=None):
         xaxis=dict(
             title="Number of Responses",
             range=[-max(values[:3]) * 1.2 if values[:3] else -10, max(values[3:]) * 1.2 if values[3:] else 10],
-            tickmode='linear',
-            tick0=0,
-            dtick=20
+            nticks=6  # Limit to ~6 tick marks for cleaner display
         ),
         yaxis=dict(title="")
     )
