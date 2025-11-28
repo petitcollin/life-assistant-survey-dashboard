@@ -22,24 +22,30 @@ def render_sidebar_filters(df_processed):
         
         # Country filter - Multi-select with checkboxes
         st.write("**Country**")
-        # Always show both NL and UK options, even if one dataset didn't load
-        available_countries = sorted([c for c in df_processed['Country'].unique() if pd.notna(c)])
-        country_options = ['NL', 'UK']  # Always show both options
+        # Get available countries from data
+        available_countries = sorted([c for c in df_processed['Country'].unique() if pd.notna(c)]) if 'Country' in df_processed.columns else []
+        # Always show both NL and UK options
+        country_options = ['NL', 'UK']
         country_filter_selected = []
+        
         for country in country_options:
             checkbox_key = f'country_checkbox_{country}'
+            # Initialize checkbox state if not exists (default: both selected)
             if checkbox_key not in st.session_state:
-                # Default: both countries selected
                 st.session_state[checkbox_key] = True
+            
+            # Show checkbox (always show both, even if data doesn't exist)
             checked = st.checkbox(
                 country,
                 value=st.session_state[checkbox_key],
                 key=checkbox_key,
                 label_visibility="visible"
             )
+            
+            # Only add to filter if checked AND country exists in data
             if checked and country in available_countries:
-                # Only add to filter if country actually exists in data
                 country_filter_selected.append(country)
+        
         st.session_state.country_filter_selected = country_filter_selected
         
         # Show active filter count
@@ -142,33 +148,20 @@ def render_sidebar_filters(df_processed):
         
         # Reset button
         if st.button("Reset Filters", use_container_width=True, key='reset_filters'):
-            # Reset country filters to default (both selected)
-            for country in ['NL', 'UK']:
-                checkbox_key = f'country_checkbox_{country}'
-                if checkbox_key not in st.session_state:
-                    st.session_state[checkbox_key] = True
-                else:
-                    st.session_state[checkbox_key] = True
-            # Clear all other checkbox states
-            for age in age_options:
-                age_key = f'age_checkbox_{age}'
-                if age_key in st.session_state:
-                    st.session_state[age_key] = False
-            for gender in gender_options:
-                gender_key = f'gender_checkbox_{gender}'
-                if gender_key in st.session_state:
-                    st.session_state[gender_key] = False
-            for usage in usage_options:
-                usage_key = f'usage_checkbox_{usage}'
-                if usage_key in st.session_state:
-                    st.session_state[usage_key] = False
-            # Set default country filter (only include countries that exist in data)
-            available_countries = sorted([c for c in df_processed['Country'].unique() if pd.notna(c)])
-            default_countries = [c for c in ['NL', 'UK'] if c in available_countries]
-            st.session_state.country_filter_selected = default_countries
-            st.session_state.age_filter_selected = []
-            st.session_state.gender_filter_selected = []
-            st.session_state.usage_filter_selected = []
+            # Clear all filter-related session state
+            keys_to_delete = []
+            for key in st.session_state.keys():
+                if (key.startswith('country_checkbox_') or 
+                    key.startswith('age_checkbox_') or 
+                    key.startswith('gender_checkbox_') or 
+                    key.startswith('usage_checkbox_') or
+                    key in ['country_filter_selected', 'age_filter_selected', 
+                           'gender_filter_selected', 'usage_filter_selected']):
+                    keys_to_delete.append(key)
+            
+            for key in keys_to_delete:
+                del st.session_state[key]
+            
             st.rerun()
     
     return df_filtered
