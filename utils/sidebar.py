@@ -6,127 +6,115 @@ import pandas as pd
 from utils.data_loader import get_filtered_data
 
 
+def get_filter_state():
+    """Get or initialize the filter state dictionary."""
+    if 'filter_state' not in st.session_state:
+        st.session_state.filter_state = {
+            'country': [],
+            'age': [],
+            'gender': [],
+            'usage': []
+        }
+    return st.session_state.filter_state
+
+
 def render_sidebar_filters(df_processed):
     """Render sidebar filters and return filtered data."""
     
-    # Initialize filters ONCE per session using a dedicated flag
-    if 'filters_initialized' not in st.session_state:
-        st.session_state.filters_initialized = True
-        # Set all default values - all unchecked by default
-        # Country
-        st.session_state['country_checkbox_NL'] = False
-        st.session_state['country_checkbox_UK'] = False
-        # Age groups
-        for age in ['18-24', '25-34', '35-44', '45-54', '55+']:
-            st.session_state[f'age_checkbox_{age}'] = False
-        # Gender
-        for gender in ['Female', 'Male', 'Non-binary']:
-            st.session_state[f'gender_checkbox_{gender}'] = False
-        # Usage
-        for usage in ['Daily', 'Occasionally', "I've only tried it once or twice", "I don't use AI tools"]:
-            st.session_state[f'usage_checkbox_{usage}'] = False
+    # Get the persistent filter state
+    filter_state = get_filter_state()
     
     with st.sidebar:
-        # Country filter - Multi-select with checkboxes
+        # Country filter
         st.write("**Country**")
-        # Get available countries from data
         available_countries = sorted([c for c in df_processed['Country'].unique() if pd.notna(c)]) if 'Country' in df_processed.columns else []
-        # Always show both NL and UK options
         country_options = ['NL', 'UK']
-        country_filter_selected = []
         
-        for country in country_options:
-            checkbox_key = f'country_checkbox_{country}'
-            checked = st.checkbox(
-                country,
-                key=checkbox_key,
-                label_visibility="visible"
-            )
-            # Only add to filter if checked AND country exists in data
-            if checked and country in available_countries:
-                country_filter_selected.append(country)
+        selected_countries = st.multiselect(
+            "Select countries",
+            options=country_options,
+            default=filter_state['country'] if filter_state['country'] else [],
+            key='country_multiselect',
+            label_visibility="collapsed"
+        )
+        filter_state['country'] = selected_countries
         
-        # Show active filter count
-        if len(country_filter_selected) > 0:
-            st.caption(f"✓ {len(country_filter_selected)} selected")
+        if len(selected_countries) > 0:
+            st.caption(f"✓ {len(selected_countries)} selected")
         else:
             st.caption("No filter (showing all)")
         
         st.markdown("---")
         
-        # Age filter - Multi-select with checkboxes
+        # Age filter
         st.write("**Age Group**")
         age_options = sorted([age for age in df_processed['Q1'].unique() if pd.notna(age)])
-        age_filter_selected = []
-        for age in age_options:
-            checkbox_key = f'age_checkbox_{age}'
-            checked = st.checkbox(
-                age,
-                key=checkbox_key,
-                label_visibility="visible"
-            )
-            if checked:
-                age_filter_selected.append(age)
         
-        # Show active filter count
-        if len(age_filter_selected) > 0:
-            st.caption(f"✓ {len(age_filter_selected)} selected")
+        selected_ages = st.multiselect(
+            "Select age groups",
+            options=age_options,
+            default=filter_state['age'] if filter_state['age'] else [],
+            key='age_multiselect',
+            label_visibility="collapsed"
+        )
+        filter_state['age'] = selected_ages
+        
+        if len(selected_ages) > 0:
+            st.caption(f"✓ {len(selected_ages)} selected")
         else:
             st.caption("No filter (showing all)")
         
         st.markdown("---")
         
-        # Gender filter - Multi-select with checkboxes
+        # Gender filter
         st.write("**Gender**")
         gender_options = sorted([g for g in df_processed['Q2'].unique() if pd.notna(g)])
-        gender_filter_selected = []
-        for gender in gender_options:
-            checkbox_key = f'gender_checkbox_{gender}'
-            checked = st.checkbox(
-                gender,
-                key=checkbox_key,
-                label_visibility="visible"
-            )
-            if checked:
-                gender_filter_selected.append(gender)
         
-        # Show active filter count
-        if len(gender_filter_selected) > 0:
-            st.caption(f"✓ {len(gender_filter_selected)} selected")
+        selected_genders = st.multiselect(
+            "Select genders",
+            options=gender_options,
+            default=filter_state['gender'] if filter_state['gender'] else [],
+            key='gender_multiselect',
+            label_visibility="collapsed"
+        )
+        filter_state['gender'] = selected_genders
+        
+        if len(selected_genders) > 0:
+            st.caption(f"✓ {len(selected_genders)} selected")
         else:
             st.caption("No filter (showing all)")
         
         st.markdown("---")
         
-        # Usage frequency filter - Multi-select with checkboxes
+        # Usage frequency filter
         st.write("**AI Usage Frequency**")
         usage_options = sorted([u for u in df_processed['Q3'].unique() if pd.notna(u)])
-        usage_filter_selected = []
-        for usage in usage_options:
-            checkbox_key = f'usage_checkbox_{usage}'
-            checked = st.checkbox(
-                usage,
-                key=checkbox_key,
-                label_visibility="visible"
-            )
-            if checked:
-                usage_filter_selected.append(usage)
         
-        # Show active filter count
-        if len(usage_filter_selected) > 0:
-            st.caption(f"✓ {len(usage_filter_selected)} selected")
+        selected_usage = st.multiselect(
+            "Select usage frequency",
+            options=usage_options,
+            default=filter_state['usage'] if filter_state['usage'] else [],
+            key='usage_multiselect',
+            label_visibility="collapsed"
+        )
+        filter_state['usage'] = selected_usage
+        
+        if len(selected_usage) > 0:
+            st.caption(f"✓ {len(selected_usage)} selected")
         else:
             st.caption("No filter (showing all)")
         
         st.markdown("---")
         
-        # Apply filters
+        # Apply filters - only include countries that exist in data
+        country_filter = [c for c in selected_countries if c in available_countries]
+        
         df_filtered = get_filtered_data(
             df_processed, 
-            age_filter_selected, 
-            gender_filter_selected, 
-            usage_filter_selected,
-            country_filter_selected
+            selected_ages, 
+            selected_genders, 
+            selected_usage,
+            country_filter
         )
         
         # Show filtered count
@@ -134,15 +122,21 @@ def render_sidebar_filters(df_processed):
         
         # Reset button
         if st.button("Reset Filters", use_container_width=True, key='reset_filters'):
-            # Reset all checkboxes to unchecked
-            for country in country_options:
-                st.session_state[f'country_checkbox_{country}'] = False
-            for age in age_options:
-                st.session_state[f'age_checkbox_{age}'] = False
-            for gender in gender_options:
-                st.session_state[f'gender_checkbox_{gender}'] = False
-            for usage in usage_options:
-                st.session_state[f'usage_checkbox_{usage}'] = False
+            st.session_state.filter_state = {
+                'country': [],
+                'age': [],
+                'gender': [],
+                'usage': []
+            }
+            # Clear the multiselect widget states
+            if 'country_multiselect' in st.session_state:
+                del st.session_state['country_multiselect']
+            if 'age_multiselect' in st.session_state:
+                del st.session_state['age_multiselect']
+            if 'gender_multiselect' in st.session_state:
+                del st.session_state['gender_multiselect']
+            if 'usage_multiselect' in st.session_state:
+                del st.session_state['usage_multiselect']
             st.rerun()
     
     return df_filtered
