@@ -102,21 +102,32 @@ def categorize_responses(df, column_prefix: str, categories: Dict[str, List[str]
     """
     import pandas as pd
     
-    # Try English column first, then original column
+    # Collect responses from both English column AND original column
+    # (NL has Q13_english, UK has Q13 directly in English)
+    all_responses = []
+    
     english_column = f"{column_prefix}_english"
     if english_column in df.columns:
-        column = english_column
-    elif column_prefix in df.columns:
-        column = column_prefix
-    else:
-        return {}
+        responses = df[english_column].dropna().astype(str).tolist()
+        all_responses.extend(responses)
     
-    # Get all responses
-    responses = df[column].dropna().astype(str).tolist()
+    # Also check original column for rows where English column is empty
+    if column_prefix in df.columns:
+        if english_column in df.columns:
+            # Get responses from original column where English column is NaN
+            mask = df[english_column].isna() & df[column_prefix].notna()
+            responses = df.loc[mask, column_prefix].astype(str).tolist()
+        else:
+            # No English column, use original directly
+            responses = df[column_prefix].dropna().astype(str).tolist()
+        all_responses.extend(responses)
+    
+    if not all_responses:
+        return {}
     
     # Categorize each response
     category_counts = {}
-    for response in responses:
+    for response in all_responses:
         category = categorize_text(response, categories)
         category_counts[category] = category_counts.get(category, 0) + 1
     
@@ -138,24 +149,31 @@ def get_sample_responses_by_category(df, column_prefix: str, categories: Dict[st
     """
     import pandas as pd
     
-    # Try English column first, then original column
+    # Collect responses from both English column AND original column
+    all_responses = []
+    
     english_column = f"{column_prefix}_english"
     if english_column in df.columns:
-        column = english_column
-    elif column_prefix in df.columns:
-        column = column_prefix
-    else:
+        responses = df[english_column].dropna().astype(str)
+        valid = responses[~responses.str.lower().str.strip().isin(['nan', 'none', ''])]
+        all_responses.extend(valid.tolist())
+    
+    # Also check original column for rows where English column is empty
+    if column_prefix in df.columns:
+        if english_column in df.columns:
+            mask = df[english_column].isna() & df[column_prefix].notna()
+            responses = df.loc[mask, column_prefix].astype(str)
+        else:
+            responses = df[column_prefix].dropna().astype(str)
+        valid = responses[~responses.str.lower().str.strip().isin(['nan', 'none', ''])]
+        all_responses.extend(valid.tolist())
+    
+    if not all_responses:
         return {}
-    
-    # Get all responses with their indices
-    responses = df[column].dropna().astype(str)
-    
-    # Filter out invalid responses
-    valid_responses = responses[~responses.str.lower().str.strip().isin(['nan', 'none', ''])]
     
     # Categorize and group responses
     category_responses = {}
-    for idx, response in valid_responses.items():
+    for response in all_responses:
         # Filter out very short responses
         if len(str(response).strip()) < 5:
             continue
@@ -163,11 +181,7 @@ def get_sample_responses_by_category(df, column_prefix: str, categories: Dict[st
         if category not in category_responses:
             category_responses[category] = []
         # Only add if not too long and somewhat informative
-        if len(response) < 300:
+        if len(response) < 300 and len(category_responses[category]) < num_samples:
             category_responses[category].append(str(response))
-    
-    # Limit to num_samples per category
-    for category in category_responses:
-        category_responses[category] = category_responses[category][:num_samples]
     
     return category_responses
