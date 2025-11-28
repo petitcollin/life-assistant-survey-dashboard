@@ -108,36 +108,73 @@ LIKERT_LABELS = {
 
 
 @st.cache_data
-def load_data(cache_version="v2.1"):
-    """Load the survey data from Excel file."""
-    # Try the new Excel file first (1000 records), then fallback to others
+def load_data(cache_version="v2.2"):
+    """Load the survey data from Excel files (both NL and UK datasets)."""
+    dfs = []
+    
+    # Load NL dataset
     try:
-        df = pd.read_excel('data/Life Assistant survey 2 (1).xlsx')
+        df_nl = pd.read_excel('data/Life Assistant survey 2 (1).xlsx')
         # Handle duplicate columns (Q1, Q2, etc. and Q1.1, Q2.1, etc.)
-        # Merge: use original columns where they exist, fallback to .1 columns
         columns_to_merge = []
-        for col in df.columns:
-            if col.endswith('.1') and col[:-2] in df.columns:
+        for col in df_nl.columns:
+            if col.endswith('.1') and col[:-2] in df_nl.columns:
                 original_col = col[:-2]
-                # Fill original column with .1 column values where original is NaN
-                df[original_col] = df[original_col].fillna(df[col])
+                df_nl[original_col] = df_nl[original_col].fillna(df_nl[col])
                 columns_to_merge.append(col)
-        # Drop the .1 columns after merging
         if columns_to_merge:
-            df = df.drop(columns=columns_to_merge)
-    except:
+            df_nl = df_nl.drop(columns=columns_to_merge)
+        df_nl['Country'] = 'NL'
+        dfs.append(df_nl)
+    except Exception as e:
+        # Fallback to other NL files
         try:
-            df = pd.read_excel('data/Life Assistant survey 2.xlsx')
+            df_nl = pd.read_excel('data/Life Assistant survey 2.xlsx')
+            df_nl['Country'] = 'NL'
+            dfs.append(df_nl)
         except:
             try:
-                df = pd.read_excel('data/ORD-95068-Z6P5Y2_2025-11-12_DD.xlsx')
+                df_nl = pd.read_excel('data/ORD-95068-Z6P5Y2_2025-11-12_DD.xlsx')
+                df_nl['Country'] = 'NL'
+                dfs.append(df_nl)
             except:
-                df = pd.read_csv('data/Life_Assistant_survey_2.csv')
+                try:
+                    df_nl = pd.read_csv('data/Life_Assistant_survey_2.csv')
+                    df_nl['Country'] = 'NL'
+                    dfs.append(df_nl)
+                except:
+                    pass
+    
+    # Load UK dataset
+    try:
+        df_uk = pd.read_excel('data/ORD-95068-Z6P5Y2_2025-11-27_DD_UK.xlsx')
+        # Handle duplicate columns if they exist
+        columns_to_merge = []
+        for col in df_uk.columns:
+            if col.endswith('.1') and col[:-2] in df_uk.columns:
+                original_col = col[:-2]
+                df_uk[original_col] = df_uk[original_col].fillna(df_uk[col])
+                columns_to_merge.append(col)
+        if columns_to_merge:
+            df_uk = df_uk.drop(columns=columns_to_merge)
+        df_uk['Country'] = 'UK'
+        dfs.append(df_uk)
+    except Exception as e:
+        pass
+    
+    # Combine both datasets
+    if len(dfs) > 0:
+        df = pd.concat(dfs, ignore_index=True)
+    else:
+        # Fallback if no data loaded
+        df = pd.DataFrame()
+        df['Country'] = []
+    
     return df
 
 
 @st.cache_data
-def preprocess_data(df, cache_version="v2.1"):
+def preprocess_data(df, cache_version="v2.2"):
     """Preprocess the data with value labels and clean missing values."""
     df_processed = df.copy()
     
@@ -177,7 +214,7 @@ def preprocess_data(df, cache_version="v2.1"):
     return df_processed
 
 
-def get_filtered_data(df, age_filter=None, gender_filter=None, usage_filter=None):
+def get_filtered_data(df, age_filter=None, gender_filter=None, usage_filter=None, country_filter=None):
     """Apply filters to the dataset.
     
     Args:
@@ -185,8 +222,13 @@ def get_filtered_data(df, age_filter=None, gender_filter=None, usage_filter=None
         age_filter: List of age groups to include (empty list = no filter)
         gender_filter: List of genders to include (empty list = no filter)
         usage_filter: List of usage frequencies to include (empty list = no filter)
+        country_filter: List of countries to include (empty list = no filter, shows all)
     """
     df_filtered = df.copy()
+    
+    # Country filter - support multiple selections
+    if country_filter and len(country_filter) > 0:
+        df_filtered = df_filtered[df_filtered['Country'].isin(country_filter)]
     
     # Age filter - support multiple selections
     if age_filter and len(age_filter) > 0:

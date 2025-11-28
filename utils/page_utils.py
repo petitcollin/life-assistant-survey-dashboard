@@ -112,7 +112,7 @@ def init_page():
     apply_compact_sidebar_css()
     
     # Cache version to force refresh when data changes
-    CACHE_VERSION = "v2.1"
+    CACHE_VERSION = "v2.2"
     
     # Initialize data - always reload to ensure we have the latest
     # Check if we need to reload based on cache version

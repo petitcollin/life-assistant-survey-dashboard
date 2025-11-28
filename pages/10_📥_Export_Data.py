@@ -17,6 +17,7 @@ st.write("Download the survey data with readable column names and labels.")
 
 # Question mappings for readable headers
 QUESTION_MAPPINGS = {
+    'Country': 'Country',
     'Q1': 'Age Group',
     'Q2': 'Gender',
     'Q3': 'How often do you use AI tools?',
